@@ -19,6 +19,8 @@ add_subdirectory(external/Midi)
 
 add_executable(MidiApp
     src/main.cpp
+    
+    src/App/App.cpp
 )
 
 target_link_libraries(MidiApp PRIVATE RtAudio::rtaudio spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
