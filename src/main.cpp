@@ -1,4 +1,5 @@
 #include <iostream>
+#include <core/midimanager.h>
 
 
 int main() {
