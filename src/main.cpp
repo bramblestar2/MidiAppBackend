@@ -1,9 +1,8 @@
 #include <iostream>
 
 #include <spdlog/spdlog.h>
-#include <MidiManager.h>
-#include <core/audioengine.h>
 
+#include "App/App.h"
 
 int main() {
     spdlog::set_level(spdlog::level::debug);
@@ -22,24 +21,12 @@ int main() {
 
     Sound sound(pathLongMpeg, 16.f, 30.f);
 
-
-
-
-    MidiManager midiManager;
-    midiManager.setMidiCallback([&sound](std::shared_ptr<MidiDevice> device, MidiMessage msg) {
-        if (device->name() == "Novation Launchpad Pro") {
-            if (msg.type() == MidiMessage::NoteOn)
-                sound.play();
-        }
+    App app;
+    app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, [&sound]() {
+        sound.play();
     });
 
-    try {
-        midiManager.refresh();
-
-    } catch (const RtMidiError &error) {
-        std::cerr << "MIDI Error: " << error.getMessage() << "\n";
-        return 1;
-    }
+    app.midiManager().refresh();
 
     std::cin.get();
 
