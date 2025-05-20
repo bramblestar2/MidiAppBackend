@@ -7,7 +7,13 @@ App::App() {
 }
 
 
-int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void()> action, int page) {
+void App::setCurrentPage(const int page) { 
+    std::lock_guard<std::mutex> lock(m_pageMutex);
+    m_currentPage = page; 
+}
+
+
+int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page) {
     int id = _acquireID();
     
     {
@@ -16,13 +22,42 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
             deviceName,
             eventType,
             key,
-            std::move(action)
+            std::move(action),
+            std::nullopt
         );
     }
 
     spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
         id, deviceName, static_cast<int>(eventType), key, page);
     
+    return id;
+}
+
+
+int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::unique_ptr<Sound>& sound, int page) {
+    int id = _acquireID();
+    
+    {
+        m_midiBindingsPages[page].emplace_back(
+            id,
+            deviceName,
+            eventType,
+            key,
+            std::function<void(App&)>{}
+        );
+
+        MidiBinding& binding_ref = m_midiBindingsPages[page].back();
+        binding_ref.sound = std::move(sound);
+        Sound* sound_ptr = binding_ref.sound.value().get();
+
+        binding_ref.action = [sound_ptr](App&) {
+            sound_ptr->play();
+        };
+    }
+
+    spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
+        id, deviceName, static_cast<int>(eventType), key, page);
+
     return id;
 }
 
@@ -60,15 +95,15 @@ void App::handleMidiMessage(std::shared_ptr<MidiDevice> device, MidiMessage msg)
     const std::string name = device->name();
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
 
-    for (auto& [page, bindings] : m_midiBindingsPages) {
-        for (auto& b : bindings) {
+    if (m_midiBindingsPages.count(m_currentPage) > 0) {
+        for (auto& b : m_midiBindingsPages.at(m_currentPage)) {
             if (b.deviceName == name &&
                 b.eventType == msg.type() &&
                 b.key == msg.key) {
-                b.action();
+                b.action(*this);
             }
         }
-    }    
+    } 
 }
 
 
