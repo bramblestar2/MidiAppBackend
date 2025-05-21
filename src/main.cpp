@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "App/App.h"
+#include "Audio/audiomanager.h"
 
 int main() {
     spdlog::set_level(spdlog::level::debug);
@@ -16,6 +17,15 @@ int main() {
     std::string pathLongMpeg = "/home/jay/Downloads/Pumpkin  - C418.mp3";
 
     setupAudioEngine();
+
+    AudioManager manager;
+
+    manager.loadFromFile(pathWav);
+    manager.loadFromFile(pathTwoWav);
+    manager.loadFromFile(pathThreeWav);
+    manager.loadFromFile(pathOgg);
+    manager.loadFromFile(pathMpeg);
+    manager.loadFromFile(pathLongMpeg);
 
     App app;
     AudioEngine engine;
