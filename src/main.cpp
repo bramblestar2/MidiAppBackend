@@ -23,6 +23,7 @@ int main() {
         std::unique_ptr<Sound> soundOne(new Sound(pathLongMpeg, 16.f, 18.f));
         std::unique_ptr<Sound> soundTwo(new Sound(pathLongMpeg, 18.f, 20.f));
         std::unique_ptr<Sound> soundThree(new Sound(pathLongMpeg, 20.f, 22.f));
+        
         app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61, soundOne);
         app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, soundTwo);
         app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F, soundThree, 1);
