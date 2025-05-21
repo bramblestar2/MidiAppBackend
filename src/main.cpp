@@ -18,7 +18,7 @@ int main() {
 
     setupAudioEngine();
 
-    AudioManager manager;
+    AudioManager& manager = AudioManager::getInstance();
 
     manager.loadFromFile(pathWav);
     manager.loadFromFile(pathTwoWav);
