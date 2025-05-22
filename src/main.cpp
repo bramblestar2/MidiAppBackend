@@ -20,23 +20,29 @@ int main() {
 
     AudioManager& manager = AudioManager::getInstance();
 
-    manager.loadFromFile(pathWav);
+    int idWav = manager.loadFromFile(pathWav);
     manager.loadFromFile(pathTwoWav);
     manager.loadFromFile(pathThreeWav);
     manager.loadFromFile(pathOgg);
     manager.loadFromFile(pathMpeg);
-    manager.loadFromFile(pathLongMpeg);
+    int idLongMpeg = manager.loadFromFile(pathLongMpeg);
+
 
     App app;
     AudioEngine engine;
     {
-        std::unique_ptr<Sound> soundOne(new Sound(pathLongMpeg, 16.f, 18.f));
-        std::unique_ptr<Sound> soundTwo(new Sound(pathLongMpeg, 18.f, 20.f));
-        std::unique_ptr<Sound> soundThree(new Sound(pathLongMpeg, 20.f, 22.f));
-        
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61, soundOne);
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, soundTwo);
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F, soundThree, 1);
+        std::shared_ptr<Sound> fullSoundOne = manager.getSound(idWav);
+        std::shared_ptr<Sound> fullSoundTwo = manager.getSound(idLongMpeg);
+
+        std::shared_ptr<Sound> clip = fullSoundTwo->createClip(10, 1);
+        std::shared_ptr<Sound> clipTwo = fullSoundTwo->createClip(11, 1);
+        std::shared_ptr<Sound> clipThree = fullSoundTwo->createClip(12, 1);
+
+        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x62, clip);
+        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61, clipTwo);
+        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, clipThree);
+        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F, fullSoundOne->clone(), 1);
+        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, fullSoundOne, 1);
         app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E, [](App& app) {
             app.setCurrentPage(1);
         });

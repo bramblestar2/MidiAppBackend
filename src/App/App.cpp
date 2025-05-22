@@ -1,5 +1,6 @@
 #include "App.h"
 
+
 App::App() {
     m_manager.setMidiCallback([this](std::shared_ptr<MidiDevice> device, MidiMessage msg) {
         this->handleMidiMessage(device, msg);
@@ -17,12 +18,15 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
     int id = _acquireID();
     
     {
+        std::vector<std::function<void(App&)>> list;
+        list.push_back(std::move(action));
+
         m_midiBindingsPages[page].emplace_back(
             id,
             deviceName,
             eventType,
             key,
-            std::move(action),
+            list,
             std::nullopt
         );
     }
@@ -34,25 +38,26 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
 }
 
 
-int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::unique_ptr<Sound>& sound, int page) {
+int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::shared_ptr<Sound> sound, int page) {
     int id = _acquireID();
     
     {
+        std::vector<std::function<void(App&)>> list;
         m_midiBindingsPages[page].emplace_back(
             id,
             deviceName,
             eventType,
             key,
-            std::function<void(App&)>{}
+            list
         );
 
         MidiBinding& binding_ref = m_midiBindingsPages[page].back();
-        binding_ref.sound = std::move(sound);
+        binding_ref.sound = sound;
         Sound* sound_ptr = binding_ref.sound.value().get();
 
-        binding_ref.action = [sound_ptr](App&) {
+        binding_ref.actions.push_back([sound_ptr](App&) {
             sound_ptr->play();
-        };
+        });
     }
 
     spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
@@ -100,7 +105,9 @@ void App::handleMidiMessage(std::shared_ptr<MidiDevice> device, MidiMessage msg)
             if (b.deviceName == name &&
                 b.eventType == msg.type() &&
                 b.key == msg.key) {
-                b.action(*this);
+                for (auto& action : b.actions) {
+                    action(*this);
+                }
             }
         }
     } 
@@ -124,4 +131,24 @@ int App::_acquireID() {
 void App::_releaseID(int id) {
     std::lock_guard<std::mutex> lock(m_idMutex);
     m_freeIDs.push(id);
+}
+
+
+
+
+MidiBindingBuilder::MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key)
+    : m_app(app), m_deviceName(deviceName), m_type(type), m_key(key)
+{
+}
+
+
+MidiBindingBuilder& MidiBindingBuilder::toSound(std::shared_ptr<Sound> sound, int page) {
+    m_app.addMidiSound(m_deviceName, m_type, m_key, sound, page);
+    return *this;
+}
+
+
+MidiBindingBuilder& MidiBindingBuilder::toAction(std::function<void(App&)> callback) {
+    m_app.addMidiBinding(m_deviceName, m_type, m_key, std::move(callback));
+    return *this;
 }

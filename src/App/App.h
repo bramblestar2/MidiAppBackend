@@ -14,6 +14,7 @@
 #include <optional>
 #include <memory>
 
+
 class App {
 private:
     struct MidiBinding {
@@ -21,8 +22,8 @@ private:
         std::string deviceName;
         MidiMessage::Type eventType;
         int key;
-        std::function<void(App&)> action;
-        std::optional<std::unique_ptr<Sound>> sound;
+        std::vector<std::function<void(App&)>> actions;
+        std::optional<std::shared_ptr<Sound>> sound;
     };
 
 public:
@@ -33,7 +34,7 @@ public:
 
     //returns binding ID
     int addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page = 0);
-    int addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::unique_ptr<Sound>& sound, int page = 0);
+    int addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::shared_ptr<Sound> sound, int page = 0);
     void removeMidiBinding(const int id);
     const std::map<int, std::vector<MidiBinding>>& getMidiBindingPages() const { return m_midiBindingsPages; }
     const std::vector<MidiBinding>& getMidiBindingsForPage(int page) const;
@@ -60,4 +61,19 @@ private:
     
     std::mutex m_pageMutex;
     int m_currentPage = 0;
+};
+
+
+class MidiBindingBuilder {
+public:
+    MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key);
+
+    MidiBindingBuilder& toSound(std::shared_ptr<Sound> sound, int page = 0);
+    MidiBindingBuilder& toAction(std::function<void(App&)> callback);
+
+private:
+    App& m_app;
+    std::string m_deviceName;
+    MidiMessage::Type m_type;
+    int m_key;
 };
