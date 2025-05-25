@@ -24,7 +24,7 @@ add_library(MidiApp
     src/App/App.cpp
 )
 
-target_link_libraries(MidiApp PRIVATE spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
+target_link_libraries(MidiApp PUBLIC spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
     MidiAudioEngine
     MidiManager
 )
