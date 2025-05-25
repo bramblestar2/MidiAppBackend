@@ -4,6 +4,7 @@
 App::App() {
     m_manager.setMidiCallback([this](std::shared_ptr<MidiDevice> device, MidiMessage msg) {
         this->handleMidiMessage(device, msg);
+        this->m_midiCallback(device, msg);
     });
 }
 
@@ -11,6 +12,11 @@ App::App() {
 void App::setCurrentPage(const int page) { 
     std::lock_guard<std::mutex> lock(m_pageMutex);
     m_currentPage = page; 
+}
+
+
+void App::setMidiCallback(std::function<void(std::shared_ptr<MidiDevice>, MidiMessage)> &&callback) {
+    m_midiCallback = std::move(callback);
 }
 
 
