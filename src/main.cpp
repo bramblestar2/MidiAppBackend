@@ -26,12 +26,12 @@ int main() {
     int idFour = app.createAudio(pathLongMpeg).start(23.0).end(24.0).build();
 
     {
-        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E).on_page(0).change_page_to(1);
+        app.midiBind("Novation Launchpad Pro").key(0x5E).type(MidiMessage::NoteOn).on_page(0).change_page_to(1);
 
-        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x62).audio(idOne);
-        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61).audio(idTwo);
-        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60).audio(idThree);
-        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F).on_page(1).audio(idThree);
+        app.midiBind("Novation Launchpad Pro").key(0x62).type(MidiMessage::NoteOn).audio(idOne);
+        app.midiBind("Novation Launchpad Pro").key(0x61).type(MidiMessage::NoteOn).audio(idTwo);
+        app.midiBind("Novation Launchpad Pro").key(0x60).type(MidiMessage::NoteOn).audio(idThree);
+        app.midiBind("Novation Launchpad Pro").key(0x5F).type(MidiMessage::NoteOn).on_page(1).audio(idThree);
 
         // app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E, [](App& app) {
         //     app.setCurrentPage(1);

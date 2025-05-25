@@ -31,18 +31,20 @@ public:
 
     class MidiBindingBuilder {
     public:
-        MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key);
+        MidiBindingBuilder(App& app, const std::string& deviceName);
 
         MidiBindingBuilder& audio(int audio_id);
         MidiBindingBuilder& action(std::function<void(App&)> callback);
         MidiBindingBuilder& on_page(int page);
         MidiBindingBuilder& change_page_to(int page);
+        MidiBindingBuilder& key(int key);
+        MidiBindingBuilder& type(MidiMessage::Type type);
 
     private:
         App& m_app;
         std::string m_deviceName;
-        MidiMessage::Type m_type;
-        int m_key;
+        MidiMessage::Type m_type = MidiMessage::Type::UNKNOWN;
+        int m_key = 0;
         int m_page = 0;
     };
 
@@ -59,7 +61,7 @@ public:
     const std::map<int, std::vector<MidiBinding>>& getMidiBindingPages() const { return m_midiBindingsPages; }
     const std::vector<MidiBinding>& getMidiBindingsForPage(int page) const;
 
-    MidiBindingBuilder midiBind(const std::string &deviceName, MidiMessage::Type type, int key);
+    MidiBindingBuilder midiBind(const std::string &deviceName);
 
     AudioBuilder createAudio(const std::string &filepath);
 

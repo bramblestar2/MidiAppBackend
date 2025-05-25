@@ -97,9 +97,9 @@ const std::vector<App::MidiBinding>& App::getMidiBindingsForPage(int page) const
 }
 
 
-App::MidiBindingBuilder App::midiBind(const std::string &deviceName, MidiMessage::Type type, int key)
+App::MidiBindingBuilder App::midiBind(const std::string &deviceName)
 {
-    return MidiBindingBuilder(*this, deviceName, type, key);
+    return MidiBindingBuilder(*this, deviceName);
 }
 
 
@@ -133,8 +133,8 @@ AudioBuilder App::createAudio(const std::string &filepath) {
 
 
 
-App::MidiBindingBuilder::MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key)
-    : m_app(app), m_deviceName(deviceName), m_type(type), m_key(key)
+App::MidiBindingBuilder::MidiBindingBuilder(App& app, const std::string& deviceName)
+    : m_app(app), m_deviceName(deviceName)
 {
 }
 
@@ -150,16 +150,32 @@ App::MidiBindingBuilder& App::MidiBindingBuilder::action(std::function<void(App&
     return *this;
 }
 
+
 App::MidiBindingBuilder &App::MidiBindingBuilder::on_page(int page)
 {
     m_page = page;
     return *this;
 }
 
+
 App::MidiBindingBuilder &App::MidiBindingBuilder::change_page_to(int page)
 {
     m_app.addMidiBinding(m_deviceName, m_type, m_key, std::move([page](App& app) {
         app.setCurrentPage(page);
     }), m_page);
+    return *this;
+}
+
+
+App::MidiBindingBuilder &App::MidiBindingBuilder::key(int key)
+{
+    m_key = key;
+    return *this;
+}
+
+
+App::MidiBindingBuilder &App::MidiBindingBuilder::type(MidiMessage::Type type)
+{
+    m_type = type;
     return *this;
 }
