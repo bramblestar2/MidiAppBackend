@@ -11,11 +11,12 @@
             "displayName": "Default Config",
             "description": "Default build using Ninja generator",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/default",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "RTAUDIO_API_PULSE": "ON"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}"
             }
         }
     ],

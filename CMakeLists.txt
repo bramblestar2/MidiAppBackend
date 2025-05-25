@@ -9,7 +9,6 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(rtmidi CONFIG REQUIRED)
-find_package(RtAudio CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
@@ -25,7 +24,7 @@ add_library(MidiApp
     src/App/App.cpp
 )
 
-target_link_libraries(MidiApp PRIVATE RtAudio::rtaudio spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
+target_link_libraries(MidiApp PRIVATE spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
     MidiAudioEngine
     MidiManager
 )
