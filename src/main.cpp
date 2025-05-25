@@ -6,7 +6,7 @@
 #include "Audio/Audio_Includes.h"
 
 int main() {
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::enable_backtrace(100);
 
 
     std::string pathWav = "/home/jay/Downloads/pickupCoin.wav";
@@ -20,19 +20,22 @@ int main() {
 
     App app;
 
-    int idOne = app.create_audio(pathLongMpeg).start(20.0).end(21.0).build();
-    int idTwo = app.create_audio(pathLongMpeg).start(21.0).end(22.0).build();
-    int idThree = app.create_audio(pathLongMpeg).start(22.0).end(23.0).build();
-    int idFour = app.create_audio(pathLongMpeg).start(23.0).end(24.0).build();
+    int idOne = app.createAudio(pathLongMpeg).start(20.0).end(21.0).build();
+    int idTwo = app.createAudio(pathLongMpeg).start(21.0).end(22.0).build();
+    int idThree = app.createAudio(pathLongMpeg).start(22.0).end(23.0).build();
+    int idFour = app.createAudio(pathLongMpeg).start(23.0).end(24.0).build();
 
     {
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x62, idOne);
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61, idTwo);
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60, idThree);
-        app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F, idFour, 1);
-        app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E, [](App& app) {
-            app.setCurrentPage(1);
-        });
+        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E).on_page(0).change_page_to(1);
+
+        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x62).audio(idOne);
+        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x61).audio(idTwo);
+        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x60).audio(idThree);
+        app.midiBind("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5F).on_page(1).audio(idThree);
+
+        // app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E, [](App& app) {
+        //     app.setCurrentPage(1);
+        // });
     }
 
     app.midiManager().refresh();
@@ -41,6 +44,8 @@ int main() {
 
 
     cleanupAudioEngine();
+
+    spdlog::dump_backtrace();
 
     return 0;
 }

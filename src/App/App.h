@@ -15,8 +15,10 @@
 #include <memory>
 
 
+
+
 class App {
-private:
+public:
     struct MidiBinding {
         int id;
         std::string deviceName;
@@ -25,6 +27,23 @@ private:
         std::vector<std::function<void(App&)>> actions;
         Audio* audio;
         int audioId;
+    };
+
+    class MidiBindingBuilder {
+    public:
+        MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key);
+
+        MidiBindingBuilder& audio(int audio_id);
+        MidiBindingBuilder& action(std::function<void(App&)> callback);
+        MidiBindingBuilder& on_page(int page);
+        MidiBindingBuilder& change_page_to(int page);
+
+    private:
+        App& m_app;
+        std::string m_deviceName;
+        MidiMessage::Type m_type;
+        int m_key;
+        int m_page = 0;
     };
 
 public:
@@ -40,8 +59,9 @@ public:
     const std::map<int, std::vector<MidiBinding>>& getMidiBindingPages() const { return m_midiBindingsPages; }
     const std::vector<MidiBinding>& getMidiBindingsForPage(int page) const;
 
+    MidiBindingBuilder midiBind(const std::string &deviceName, MidiMessage::Type type, int key);
 
-    AudioBuilder create_audio(const std::string &filepath);
+    AudioBuilder createAudio(const std::string &filepath);
 
 
     MidiManager& midiManager() { return m_manager; }
@@ -62,19 +82,4 @@ private:
     
     std::mutex m_pageMutex;
     int m_currentPage = 0;
-};
-
-
-class MidiBindingBuilder {
-public:
-    MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key);
-
-    MidiBindingBuilder& toSound(int audio_id, int page = 0);
-    MidiBindingBuilder& toAction(std::function<void(App&)> callback);
-
-private:
-    App& m_app;
-    std::string m_deviceName;
-    MidiMessage::Type m_type;
-    int m_key;
 };
