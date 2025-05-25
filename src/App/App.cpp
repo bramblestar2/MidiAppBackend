@@ -28,7 +28,7 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
             eventType,
             key,
             list,
-            std::nullopt
+            nullptr
         );
     }
 
@@ -50,7 +50,9 @@ int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int k
             deviceName,
             eventType,
             key,
-            list
+            list,
+            nullptr,
+            audio_id
         );
 
         MidiBinding& binding_ref = m_midiBindingsPages[page].back();
@@ -111,6 +113,14 @@ void App::handleMidiMessage(std::shared_ptr<MidiDevice> device, MidiMessage msg)
         }
     } 
 }
+
+
+AudioBuilder App::create_audio(const std::string &filepath) {
+    return m_engine.create_audio(filepath);
+}
+
+
+
 
 
 

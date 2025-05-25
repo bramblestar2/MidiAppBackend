@@ -24,6 +24,7 @@ private:
         int key;
         std::vector<std::function<void(App&)>> actions;
         Audio* audio;
+        int audioId;
     };
 
 public:
@@ -38,6 +39,10 @@ public:
     void removeMidiBinding(const int id);
     const std::map<int, std::vector<MidiBinding>>& getMidiBindingPages() const { return m_midiBindingsPages; }
     const std::vector<MidiBinding>& getMidiBindingsForPage(int page) const;
+
+
+    AudioBuilder create_audio(const std::string &filepath);
+
 
     MidiManager& midiManager() { return m_manager; }
     AudioEngine& audioEngine() { return m_engine; }

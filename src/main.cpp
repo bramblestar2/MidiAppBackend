@@ -20,10 +20,10 @@ int main() {
 
     App app;
 
-    int idOne = app.audioEngine().create_audio(pathLongMpeg).start(20.0).end(21.0).build();
-    int idTwo = app.audioEngine().create_audio(pathLongMpeg).start(21.0).end(22.0).build();
-    int idThree = app.audioEngine().create_audio(pathLongMpeg).start(22.0).end(23.0).build();
-    int idFour = app.audioEngine().create_audio(pathLongMpeg).start(23.0).end(24.0).build();
+    int idOne = app.create_audio(pathLongMpeg).start(20.0).end(21.0).build();
+    int idTwo = app.create_audio(pathLongMpeg).start(21.0).end(22.0).build();
+    int idThree = app.create_audio(pathLongMpeg).start(22.0).end(23.0).build();
+    int idFour = app.create_audio(pathLongMpeg).start(23.0).end(24.0).build();
 
     {
         app.addMidiSound("Novation Launchpad Pro", MidiMessage::NoteOn, 0x62, idOne);
