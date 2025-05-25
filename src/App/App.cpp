@@ -15,7 +15,8 @@ void App::setCurrentPage(const int page) {
 
 
 int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page) {
-    int id = _acquireID();
+    std::lock_guard<std::mutex> lock(m_bindingsMutex);
+    int id = m_idPool.acquire();
     
     {
         std::vector<std::function<void(App&)>> list;
@@ -38,8 +39,9 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
 }
 
 
-int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, std::shared_ptr<Sound> sound, int page) {
-    int id = _acquireID();
+int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, int audio_id, int page) {
+    std::lock_guard<std::mutex> lock(m_bindingsMutex);
+    int id = m_idPool.acquire();
     
     {
         std::vector<std::function<void(App&)>> list;
@@ -52,11 +54,10 @@ int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int k
         );
 
         MidiBinding& binding_ref = m_midiBindingsPages[page].back();
-        binding_ref.sound = sound;
-        Sound* sound_ptr = binding_ref.sound.value().get();
+        binding_ref.audio = m_engine.get(audio_id);
 
-        binding_ref.actions.push_back([sound_ptr](App&) {
-            sound_ptr->play();
+        binding_ref.actions.push_back([this, audio_id](App&) {
+            m_engine.play(audio_id);
         });
     }
 
@@ -76,9 +77,8 @@ void App::removeMidiBinding(const int id) {
                 return b.id == id;
             });
         if (it != bindings.end()) {
-            // release all removed IDs back to pool
             for (auto itr = it; itr != bindings.end(); ++itr) {
-                _releaseID(itr->id);
+                m_idPool.release(itr->id);
             }
             bindings.erase(it, bindings.end());
         }
@@ -89,7 +89,6 @@ void App::removeMidiBinding(const int id) {
 const std::vector<App::MidiBinding>& App::getMidiBindingsForPage(int page) const {
     static const std::vector<MidiBinding> empty;
 
-    std::lock_guard<std::mutex> lock(m_bindingsMutex);
     auto it = m_midiBindingsPages.find(page);
 
     return (it != m_midiBindingsPages.end()) ? it->second : empty;
@@ -115,26 +114,6 @@ void App::handleMidiMessage(std::shared_ptr<MidiDevice> device, MidiMessage msg)
 
 
 
-int App::_acquireID() {
-    std::lock_guard<std::mutex> lock(m_idMutex);
-
-    if (!m_freeIDs.empty()) {
-        int id = m_freeIDs.front();
-        m_freeIDs.pop();
-        return id;
-    }
-
-    return m_nextID++;
-}
-
-
-void App::_releaseID(int id) {
-    std::lock_guard<std::mutex> lock(m_idMutex);
-    m_freeIDs.push(id);
-}
-
-
-
 
 MidiBindingBuilder::MidiBindingBuilder(App& app, const std::string& deviceName, MidiMessage::Type type, int key)
     : m_app(app), m_deviceName(deviceName), m_type(type), m_key(key)
@@ -142,8 +121,8 @@ MidiBindingBuilder::MidiBindingBuilder(App& app, const std::string& deviceName, 
 }
 
 
-MidiBindingBuilder& MidiBindingBuilder::toSound(std::shared_ptr<Sound> sound, int page) {
-    m_app.addMidiSound(m_deviceName, m_type, m_key, sound, page);
+MidiBindingBuilder& MidiBindingBuilder::toSound(int audio_id, int page) {
+    m_app.addMidiSound(m_deviceName, m_type, m_key, audio_id, page);
     return *this;
 }
 
