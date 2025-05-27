@@ -2,7 +2,7 @@
 
 
 App::App() {
-    m_manager.setMidiCallback([this](std::shared_ptr<MidiDevice> device, MidiMessage msg) {
+    m_manager.setMidiCallback([this](MidiDevice* device, MidiMessage msg) {
         this->handleMidiMessage(device, msg);
         this->m_midiCallback(device, msg);
     });
@@ -15,7 +15,7 @@ void App::setCurrentPage(const int page) {
 }
 
 
-void App::setMidiCallback(std::function<void(std::shared_ptr<MidiDevice>, MidiMessage)> &&callback) {
+void App::setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback) {
     m_midiCallback = std::move(callback);
 }
 
@@ -109,7 +109,7 @@ App::MidiBindingBuilder App::midiBind(const std::string &deviceName)
 }
 
 
-void App::handleMidiMessage(std::shared_ptr<MidiDevice> device, MidiMessage msg) {
+void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
     const std::string name = device->name();
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
 
