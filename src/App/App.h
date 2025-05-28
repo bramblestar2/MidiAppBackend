@@ -55,6 +55,7 @@ public:
     const int& getCurrentPage() const { return m_currentPage; }
 
     void setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback);
+    void onMidiBindingsChanged(std::function<void()> callback);
 
     //returns binding ID
     int addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page = 0);
@@ -65,6 +66,8 @@ public:
 
     MidiBindingBuilder midiBind(const std::string &deviceName);
 
+    std::vector<App::MidiBinding*> getMidiBindings();
+
     AudioBuilder createAudio(const std::string &filepath);
 
     MidiManager& midiManager() { return m_manager; }
@@ -73,8 +76,6 @@ public:
 private:
     void handleMidiMessage(MidiDevice* device, MidiMessage msg);
 
-
-private:
     MidiManager m_manager;
     AudioEngine m_engine;
 
@@ -87,5 +88,5 @@ private:
     int m_currentPage = 0;
 
     std::function<void(MidiDevice*, MidiMessage)> m_midiCallback;
-    
+    std::function<void()> m_midiBindingsChangedCallback;
 };

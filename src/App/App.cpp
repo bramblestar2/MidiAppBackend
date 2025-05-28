@@ -19,6 +19,10 @@ void App::setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callba
     m_midiCallback = std::move(callback);
 }
 
+void App::onMidiBindingsChanged(std::function<void()> callback)
+{
+    m_midiBindingsChangedCallback = std::move(callback);
+}
 
 int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page) {
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
@@ -41,6 +45,9 @@ int App::addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int
     spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
         id, deviceName, static_cast<int>(eventType), key, page);
     
+
+    this->m_midiBindingsChangedCallback();
+
     return id;
 }
 
@@ -71,6 +78,8 @@ int App::addMidiSound(std::string deviceName, MidiMessage::Type eventType, int k
 
     spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
         id, deviceName, static_cast<int>(eventType), key, page);
+
+    this->m_midiBindingsChangedCallback();
 
     return id;
 }
@@ -106,6 +115,20 @@ const std::vector<App::MidiBinding>& App::getMidiBindingsForPage(int page) const
 App::MidiBindingBuilder App::midiBind(const std::string &deviceName)
 {
     return MidiBindingBuilder(*this, deviceName);
+}
+
+
+std::vector<App::MidiBinding *> App::getMidiBindings()
+{
+    std::vector<App::MidiBinding *> result;
+
+    for (auto& [page, bindings] : m_midiBindingsPages) {
+        for (auto& binding : bindings) {
+            result.emplace_back(&binding);
+        }
+    }
+
+    return result;
 }
 
 
