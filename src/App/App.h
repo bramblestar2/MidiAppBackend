@@ -15,7 +15,8 @@
 #include <memory>
 
 
-
+class App;
+class MidiBindingBuilder;
 
 class App {
 public:
@@ -27,25 +28,8 @@ public:
         std::vector<std::function<void(App&)>> actions;
         Audio* audio;
         int audioId;
-    };
-
-    class MidiBindingBuilder {
-    public:
-        MidiBindingBuilder(App& app, const std::string& deviceName);
-
-        MidiBindingBuilder& audio(int audio_id);
-        MidiBindingBuilder& action(std::function<void(App&)> callback);
-        MidiBindingBuilder& on_page(int page);
-        MidiBindingBuilder& change_page_to(int page);
-        MidiBindingBuilder& key(int key);
-        MidiBindingBuilder& type(MidiMessage::Type type);
-
-    private:
-        App& m_app;
-        std::string m_deviceName;
-        MidiMessage::Type m_type = MidiMessage::Type::UNKNOWN;
-        int m_key = 0;
-        int m_page = 0;
+        int toPage;
+        int onPage;
     };
 
 public:
@@ -58,7 +42,7 @@ public:
     void onMidiBindingsChanged(std::function<void()> callback);
 
     //returns binding ID
-    int addMidiBinding(std::string deviceName, MidiMessage::Type eventType, int key, std::function<void(App&)> action, int page = 0);
+    int addMidiBinding(MidiBinding&& binding);
     int addMidiSound(std::string deviceName, MidiMessage::Type eventType, int key, int audio_id, int page = 0);
     void removeMidiBinding(const int id);
     const std::map<int, std::vector<MidiBinding>>& getMidiBindingPages() const { return m_midiBindingsPages; }
@@ -89,4 +73,31 @@ private:
 
     std::function<void(MidiDevice*, MidiMessage)> m_midiCallback;
     std::function<void()> m_midiBindingsChangedCallback;
+};
+
+
+
+
+class MidiBindingBuilder {
+public:
+    MidiBindingBuilder(App& app, const std::string& deviceName);
+
+    MidiBindingBuilder& audio(int audio_id);
+    MidiBindingBuilder& action(std::function<void(App&)> callback);
+    MidiBindingBuilder& on_page(int page);
+    MidiBindingBuilder& change_page_to(int page);
+    MidiBindingBuilder& key(int key);
+    MidiBindingBuilder& type(MidiMessage::Type type);
+
+    void build();
+
+private:
+    App& m_app;
+    std::string m_deviceName;
+    MidiMessage::Type m_type = MidiMessage::Type::UNKNOWN;
+    int m_key = 0;
+    int m_onPage = 0;
+    int m_toPage = 0;
+    int m_audioId = 0;
+    std::vector<std::function<void(App&)>> m_actions;
 };
