@@ -8,6 +8,8 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(GENERATE_LIB "ON" CACHE STRING "Generate library")
+
 find_package(rtmidi CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
@@ -22,6 +24,7 @@ add_executable(MidiApp
     src/main.cpp
     
     src/App/App.cpp
+    src/App/IdPool.cpp
 )
 
 target_include_directories(MidiApp PUBLIC
@@ -29,6 +32,11 @@ target_include_directories(MidiApp PUBLIC
 )
 
 target_link_libraries(MidiApp PUBLIC spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
-    MidiAudioEngine
+    RustToCaudioEngine
+    MidiManager
+)
+
+add_dependencies(MidiApp
+    RustToCaudioEngine
     MidiManager
 )
