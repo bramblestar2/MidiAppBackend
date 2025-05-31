@@ -4,7 +4,8 @@
 App::App() {
     m_manager.setMidiCallback([this](MidiDevice* device, MidiMessage msg) {
         this->handleMidiMessage(device, msg);
-        this->m_midiCallback(device, msg);
+
+        if (this->m_midiCallback) this->m_midiCallback(device, msg);
     });
 }
 
@@ -35,7 +36,6 @@ int App::addMidiBinding(MidiBinding&& binding) {
         m_midiBindingsPages[binding.onPage].emplace_back(std::move(binding));
     }
     
-
     if (m_midiBindingsChangedCallback) this->m_midiBindingsChangedCallback();
 
     return id;
@@ -107,9 +107,7 @@ void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
                     setCurrentPage(b.toPage);
                 }
 
-                std::cout << "Playing audio: " << b.audioId << std::endl;
                 m_audioengine.play(b.audioId);
-                std::cout << "Played audio: " << b.audioId << std::endl;
             }
         }
     } 

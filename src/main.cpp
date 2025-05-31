@@ -23,7 +23,7 @@ int main() {
     });
 
     app.setCurrentPage(0);
-    auto audio = app.createAudio(pathWav).build();
+    auto audio = app.createAudio(pathWav).set_filepath(pathWav).build();
     // auto audioOne = app.createAudio(pathLongMpeg).set_start(21.0).set_end(22.0).build();
     // auto audioTwo = app.createAudio(pathLongMpeg).set_start(22.0).set_end(23.0).build();
     // auto audioThree = app.createAudio(pathLongMpeg).set_start(23.0).set_end(30.0).build();
@@ -34,7 +34,7 @@ int main() {
     // int idFour = app.audioEngine().add(audioThree);
 
     // {
-        app.midiBind("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).change_page_to(1).build();
+        app.midiBind("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).build();
 
     //     app.midiBind("Novation Launchpad Pro").key(0x62).type(MidiMessage::NoteOn).audio(idOne).build();
     //     app.midiBind("Novation Launchpad Pro").key(0x61).type(MidiMessage::NoteOn).audio(idTwo).build();
