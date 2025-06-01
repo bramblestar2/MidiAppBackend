@@ -23,7 +23,7 @@ int main() {
     });
 
     app.setCurrentPage(0);
-    auto audio = app.createAudio(pathWav).set_filepath(pathWav).build();
+    auto audio = app.createAudio().set_filepath(pathWav).build();
     // auto audioOne = app.createAudio(pathLongMpeg).set_start(21.0).set_end(22.0).build();
     // auto audioTwo = app.createAudio(pathLongMpeg).set_start(22.0).set_end(23.0).build();
     // auto audioThree = app.createAudio(pathLongMpeg).set_start(23.0).set_end(30.0).build();

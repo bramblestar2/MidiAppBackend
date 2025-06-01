@@ -20,7 +20,7 @@ add_subdirectory(external/Midi)
 
 # add_executable
 # add_library
-add_executable(MidiApp
+add_library(MidiApp
     src/main.cpp
     
     src/App/App.cpp

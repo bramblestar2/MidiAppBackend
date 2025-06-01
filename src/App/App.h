@@ -42,6 +42,7 @@ public:
 
     void setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback);
     void onMidiBindingsChanged(std::function<void()> callback);
+    void onAudioListChanged(std::function<void()> callback);
 
     //returns binding ID
     int addMidiBinding(MidiBinding&& binding);
@@ -54,7 +55,7 @@ public:
     std::vector<App::MidiBinding*> getMidiBindings();
 
 
-    AudioBuilder createAudio(const std::string& path);
+    AudioBuilder createAudio();
 
 
     MidiManager& midiManager() { return m_manager; }

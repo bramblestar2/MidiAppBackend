@@ -25,6 +25,13 @@ void App::onMidiBindingsChanged(std::function<void()> callback)
     m_midiBindingsChangedCallback = std::move(callback);
 }
 
+
+void App::onAudioListChanged(std::function<void()> callback)
+{
+    m_audioengine.set_on_audio_list_changed(std::move(callback));
+}
+
+
 int App::addMidiBinding(MidiBinding&& binding) {
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
     int id = m_idPool.acquire();
@@ -114,7 +121,7 @@ void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
 }
 
 
-AudioBuilder App::createAudio(const std::string &filepath) {
+AudioBuilder App::createAudio() {
     return m_audioengine.create();
 }
 
