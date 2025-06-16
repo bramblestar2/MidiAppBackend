@@ -15,6 +15,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 add_subdirectory(external/AudioEngine)
 add_subdirectory(external/Midi)
@@ -41,6 +42,7 @@ target_link_libraries(MidiApp PUBLIC
     OpenAL::OpenAL 
     RtMidi::rtmidi
     nlohmann_json::nlohmann_json
+    unofficial::sqlite3::sqlite3
 
     improved_rust_audio
     MidiManager
