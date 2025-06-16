@@ -22,33 +22,27 @@ int main() {
         std::cout << device->name() << ": " << std::hex << msg.key << std::endl;
     });
 
+    AudioBuilder builder;
+    builder.set_file(pathWav);
+    int idOne = app.audioEngine().create(builder);
+
     app.setCurrentPage(0);
-    auto audio = app.createAudio().set_filepath(pathWav).build();
     // auto audioOne = app.createAudio(pathLongMpeg).set_start(21.0).set_end(22.0).build();
     // auto audioTwo = app.createAudio(pathLongMpeg).set_start(22.0).set_end(23.0).build();
     // auto audioThree = app.createAudio(pathLongMpeg).set_start(23.0).set_end(30.0).build();
 
-    int idOne = app.audioEngine().add(audio);
     // int idTwo = app.audioEngine().add(audioOne);
     // int idThree = app.audioEngine().add(audioTwo);
     // int idFour = app.audioEngine().add(audioThree);
 
-    // {
-        app.midiBind("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).build();
-
-    //     app.midiBind("Novation Launchpad Pro").key(0x62).type(MidiMessage::NoteOn).audio(idOne).build();
-    //     app.midiBind("Novation Launchpad Pro").key(0x61).type(MidiMessage::NoteOn).audio(idTwo).build();
-    //     app.midiBind("Novation Launchpad Pro").key(0x60).type(MidiMessage::NoteOn).audio(idThree).build();
-    //     app.midiBind("Novation Launchpad Pro").key(0x5F).type(MidiMessage::NoteOn).on_page(1).audio(idFour).build();
-
-    //     // app.addMidiBinding("Novation Launchpad Pro", MidiMessage::NoteOn, 0x5E, [](App& app) {
-    //     //     app.setCurrentPage(1);
-    //     // });
-    // }
+    auto binding = MidiBindingBuilder("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).build();
+    app.addMidiBinding(binding);
 
     
     app.midiManager().refresh();
     
+    app.json();
+
     std::cin.get();
 
     spdlog::dump_backtrace();

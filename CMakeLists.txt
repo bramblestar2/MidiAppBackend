@@ -14,29 +14,43 @@ find_package(rtmidi CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_subdirectory(external/AudioEngine)
 add_subdirectory(external/Midi)
 
 # add_executable
 # add_library
-add_library(MidiApp
+add_executable(MidiApp
     src/main.cpp
     
     src/App/App.cpp
     src/App/IdPool.cpp
+    src/App/MidiBindingBuilder.cpp
+    src/App/MidiBindingManager.cpp
+    src/App/json.cpp
 )
 
 target_include_directories(MidiApp PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(MidiApp PUBLIC spdlog::spdlog SndFile::sndfile OpenAL::OpenAL RtMidi::rtmidi
-    RustToCaudioEngine
+target_link_libraries(MidiApp PUBLIC 
+    spdlog::spdlog 
+    SndFile::sndfile 
+    OpenAL::OpenAL 
+    RtMidi::rtmidi
+    nlohmann_json::nlohmann_json
+
+    improved_rust_audio
     MidiManager
 )
 
 add_dependencies(MidiApp
-    RustToCaudioEngine
+    improved_rust_audio
     MidiManager
+)
+
+target_include_directories(improved_rust_audio PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

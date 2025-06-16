@@ -1,4 +1,7 @@
-#include "App.h"
+#include "App/App.h"
+#include <fstream>
+#include <algorithm>
+#include "App/json.h"
 
 
 App::App() {
@@ -22,165 +25,78 @@ void App::setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callba
 
 void App::onMidiBindingsChanged(std::function<void()> callback)
 {
-    m_midiBindingsChangedCallback = std::move(callback);
+    m_midiBindingsManager.onMidiBindingsChanged(callback);
 }
 
 
 void App::onAudioListChanged(std::function<void()> callback)
 {
-    m_audioengine.set_on_audio_list_changed(std::move(callback));
+    m_audioengine.onAudioListChanged(std::move(callback));
 }
 
 
-int App::addMidiBinding(MidiBinding&& binding) {
-    std::lock_guard<std::mutex> lock(m_bindingsMutex);
-    int id = m_idPool.acquire();
-    
-    {
-        spdlog::debug("Added MIDI binding: ID={}, Device='{}', Event={}, Key={}, Page={}", 
-            id, binding.deviceName, static_cast<int>(binding.eventType), binding.key, binding.onPage);
-
-        m_midiBindingsPages[binding.onPage].emplace_back(std::move(binding));
-    }
-    
-    if (m_midiBindingsChangedCallback) this->m_midiBindingsChangedCallback();
-
-    return id;
+int App::addMidiBinding(MidiBinding binding) 
+{
+    return m_midiBindingsManager.addMidiBinding(binding);
 }
 
-void App::removeMidiBinding(const int id) {
-    std::lock_guard<std::mutex> lock(m_bindingsMutex);
-
-    for (auto& [page, bindings] : m_midiBindingsPages) {
-        auto it = std::remove_if(bindings.begin(), bindings.end(),
-            [this, id](const MidiBinding& b) {
-                return b.id == id;
-            });
-        if (it != bindings.end()) {
-            for (auto itr = it; itr != bindings.end(); ++itr) {
-                m_idPool.release(itr->id);
-            }
-            bindings.erase(it, bindings.end());
-        }
-    }
+void App::removeMidiBinding(const int id) 
+{
+    m_midiBindingsManager.removeMidiBinding(id);
 }
 
 
-const std::vector<App::MidiBinding>& App::getMidiBindingsForPage(int page) const {
-    static const std::vector<MidiBinding> empty;
+const std::map<int, std::vector<MidiBinding>> &App::getMidiBindingPages() const
+{
+    return m_midiBindingsManager.getPages();
+}
 
-    auto it = m_midiBindingsPages.find(page);
 
-    return (it != m_midiBindingsPages.end()) ? it->second : empty;
+std::vector<MidiBinding*> App::getMidiBindingsForPage(int page) 
+{
+    return m_midiBindingsManager.getBindingsForPage(page);
 }
 
 
 MidiBindingBuilder App::midiBind(const std::string &deviceName)
 {
-    return MidiBindingBuilder(this, deviceName);
+    return MidiBindingBuilder(deviceName);
 }
 
 
-std::vector<App::MidiBinding *> App::getMidiBindings()
+std::vector<MidiBinding *> App::getMidiBindings()
 {
-    std::vector<App::MidiBinding *> result;
-
-    for (auto& [page, bindings] : m_midiBindingsPages) {
-        for (auto& binding : bindings) {
-            result.emplace_back(&binding);
-        }
-    }
-
-    return result;
+    return m_midiBindingsManager.getMidiBindings();
 }
 
 
 void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
-    const std::string name = device->name();
-    std::lock_guard<std::mutex> lock(m_bindingsMutex);
-
-    if (m_midiBindingsPages.count(m_currentPage) > 0) {
-        int page = m_currentPage;
-
-        for (auto& b : m_midiBindingsPages.at(page)) {
-            if (b.deviceName == name &&
-                b.eventType == msg.type() &&
-                b.key == msg.key) {
-                for (auto& action : b.actions) {
-                    action(*this);
-                }
-
-                if (b.toPage != -1) {
-                    setCurrentPage(b.toPage);
-                }
-
-                m_audioengine.play(b.audioId);
-            }
-        }
-    } 
+    m_midiBindingsManager.handleMidiMessage(this, device, msg);
 }
 
 
-AudioBuilder App::createAudio() {
-    return m_audioengine.create();
+nlohmann::json App::json() {
+    std::map<std::string, std::vector<MidiBinding>> pages;
+
+    std::transform(m_midiBindingsManager.getPages().begin(), m_midiBindingsManager.getPages().end(), std::inserter(pages, pages.begin()),
+        [](const std::pair<int, std::vector<MidiBinding>>& page) {
+            return std::make_pair(std::to_string(page.first), page.second);
+        });
+
+    nlohmann::json j = {
+        { "bindings", pages },
+        { "audio", nlohmann::json::parse(m_audioengine.json()) }
+    };
+
+    return j.dump();
 }
 
 
-
-
-
-
-
-MidiBindingBuilder::MidiBindingBuilder(App* app, const std::string& deviceName)
-    : m_app(app), m_deviceName(deviceName)
-{
+bool App::load(std::string filepath) {
+    return false;
 }
 
 
-MidiBindingBuilder& MidiBindingBuilder::audio(int audio_id) {
-    m_audioId = audio_id;
-    return *this;
-}
-
-
-MidiBindingBuilder& MidiBindingBuilder::action(std::function<void(App&)> callback) {
-    this->m_actions.push_back(std::move(callback));
-    return *this;
-}
-
-
-MidiBindingBuilder &MidiBindingBuilder::on_page(int page) {
-    m_onPage = page;
-    return *this;
-}
-
-
-MidiBindingBuilder &MidiBindingBuilder::change_page_to(int page) {
-    m_toPage = page;
-    return *this;
-}
-
-
-MidiBindingBuilder &MidiBindingBuilder::key(int key) {
-    m_key = key;
-    return *this;
-}
-
-
-MidiBindingBuilder &MidiBindingBuilder::type(MidiMessage::Type type) {
-    m_type = type;
-    return *this;
-}
-
-
-void MidiBindingBuilder::build() {
-    App::MidiBinding binding;
-    binding.actions = std::move(this->m_actions);
-    binding.audioId = this->m_audioId;
-    binding.deviceName = this->m_deviceName;
-    binding.eventType = this->m_type;
-    binding.key = this->m_key;
-    binding.toPage = this->m_toPage;
-    binding.onPage = this->m_onPage;
-    m_app->addMidiBinding(std::move(binding));
+bool App::save(std::string filepath) {
+    return false;
 }
