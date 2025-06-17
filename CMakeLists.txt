@@ -8,8 +8,6 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(GENERATE_LIB "ON" CACHE STRING "Generate library")
-
 find_package(rtmidi CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SndFile CONFIG REQUIRED)
@@ -20,11 +18,10 @@ find_package(unofficial-sqlite3 CONFIG REQUIRED)
 add_subdirectory(external/AudioEngine)
 add_subdirectory(external/Midi)
 
-# add_executable
-# add_library
-add_executable(MidiApp
-    src/main.cpp
-    
+
+# LIBRARY
+
+add_library(MidiAppCore STATIC
     src/App/App.cpp
     src/App/IdPool.cpp
     src/App/MidiBindingBuilder.cpp
@@ -32,27 +29,38 @@ add_executable(MidiApp
     src/App/json.cpp
 )
 
-target_include_directories(MidiApp PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_include_directories(MidiAppCore
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(MidiApp PUBLIC 
-    spdlog::spdlog 
-    SndFile::sndfile 
-    OpenAL::OpenAL 
-    RtMidi::rtmidi
-    nlohmann_json::nlohmann_json
-    unofficial::sqlite3::sqlite3
+target_link_libraries(MidiAppCore
+    PUBLIC
+        spdlog::spdlog
+        SndFile::sndfile
+        OpenAL::OpenAL
+        RtMidi::rtmidi
+        nlohmann_json::nlohmann_json
+        unofficial::sqlite3::sqlite3
 
+        improved_rust_audio
+        MidiManager
+)
+
+add_dependencies(MidiAppCore
     improved_rust_audio
     MidiManager
 )
 
-add_dependencies(MidiApp
-    improved_rust_audio
-    MidiManager
+
+# EXECUTABLE
+
+add_executable(MidiApp
+    src/main.cpp
 )
 
-target_include_directories(improved_rust_audio PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_link_libraries(MidiApp
+    PRIVATE
+        MidiAppCore
 )

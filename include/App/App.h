@@ -52,10 +52,16 @@ public:
     MidiManager& midiManager() { return m_manager; }
 
     nlohmann::json json();
-    bool load(std::string filepath);
-    bool save(std::string filepath);
+    bool load(std::string directory);
+    bool save(std::string directory);
 
 private:
+    bool saveBindings(std::string filepath);
+    bool saveAudio(std::string filepath);
+    bool loadBindings(std::string filepath);
+    bool loadAudio(std::string filepath);
+
+
     MidiManager m_manager;
     AudioEngine m_audioengine;
     MidiBindingManager m_midiBindingsManager;

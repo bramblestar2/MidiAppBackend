@@ -22,26 +22,30 @@ int main() {
         std::cout << device->name() << ": " << std::hex << msg.key << std::endl;
     });
 
-    AudioBuilder builder;
-    builder.set_file(pathWav);
-    int idOne = app.audioEngine().create(builder);
+    AudioBuilder builderOne;
+    builderOne.set_file(pathWav);
+    AudioBuilder builderTwo;
+    builderTwo.set_file(pathTwoWav);
+    int idOne = app.audioEngine().create(builderOne);
+    int idTwo = app.audioEngine().create(builderTwo);
 
     app.setCurrentPage(0);
-    // auto audioOne = app.createAudio(pathLongMpeg).set_start(21.0).set_end(22.0).build();
-    // auto audioTwo = app.createAudio(pathLongMpeg).set_start(22.0).set_end(23.0).build();
-    // auto audioThree = app.createAudio(pathLongMpeg).set_start(23.0).set_end(30.0).build();
-
-    // int idTwo = app.audioEngine().add(audioOne);
-    // int idThree = app.audioEngine().add(audioTwo);
-    // int idFour = app.audioEngine().add(audioThree);
 
     auto binding = MidiBindingBuilder("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).build();
+    auto pageBinding = MidiBindingBuilder("Novation Launchpad Pro").audio(idTwo).key(0x5F).type(MidiMessage::NoteOn).on_page(0).change_page_to(1).build();
+    auto backBinding = MidiBindingBuilder("Novation Launchpad Pro").key(0x5F).type(MidiMessage::NoteOn).on_page(1).change_page_to(0).build();
     app.addMidiBinding(binding);
+    app.addMidiBinding(pageBinding);
+    app.addMidiBinding(backBinding);
 
     
     app.midiManager().refresh();
     
     app.json();
+
+    app.save("/home/jay/Desktop/TestingAudio");
+
+    app.load("/home/jay/Desktop/TestingAudio");
 
     std::cin.get();
 

@@ -16,6 +16,7 @@ public:
     void handleMidiMessage(App* app, MidiDevice* device, MidiMessage msg);
 
     //returns binding ID
+    void setMidiBindings(std::map<int, std::vector<MidiBinding>> bindings);
     int addMidiBinding(MidiBinding binding);
     void removeMidiBinding(const int id);
 

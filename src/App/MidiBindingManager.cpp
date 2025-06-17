@@ -30,6 +30,13 @@ void MidiBindingManager::handleMidiMessage(App* app, MidiDevice* device, MidiMes
 }
 
 
+void MidiBindingManager::setMidiBindings(std::map<int, std::vector<MidiBinding>> bindings)
+{
+    std::lock_guard<std::mutex> lock(m_bindingsMutex);
+    m_midiBindingsPages = bindings;
+}
+
+
 int MidiBindingManager::addMidiBinding(MidiBinding binding) {
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
     int id = m_idPool.acquire();
