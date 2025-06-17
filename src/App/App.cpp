@@ -107,8 +107,8 @@ bool App::load(std::string directory) {
         return false;
     }
 
-    if (loadBindings(filepath)) {
-        return loadAudio(filepath);
+    if (loadBindings(filepath.string())) {
+        return loadAudio(filepath.string());
     }
 
     return false;
@@ -122,8 +122,8 @@ bool App::save(std::string directory) {
 
     std::filesystem::path filepath = std::filesystem::path(directory) / "project.db";
     
-    if (saveBindings(filepath)) {
-        return saveAudio(filepath);
+    if (saveBindings(filepath.string())) {
+        return saveAudio(filepath.string());
     }
 
     return false;
