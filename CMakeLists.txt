@@ -53,6 +53,11 @@ add_dependencies(MidiAppCore
     MidiManager
 )
 
+set_target_properties(MidiAppCore PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
 
 # EXECUTABLE
 
@@ -63,4 +68,8 @@ add_executable(MidiApp
 target_link_libraries(MidiApp
     PRIVATE
         MidiAppCore
+)
+
+set_target_properties(MidiApp PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
