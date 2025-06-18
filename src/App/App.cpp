@@ -20,6 +20,8 @@ App::App() {
 void App::setCurrentPage(const int page) { 
     std::lock_guard<std::mutex> lock(m_pageMutex);
     m_currentPage = page; 
+
+    if (m_pageChangedCallback) this->m_pageChangedCallback(page);
 }
 
 
@@ -36,6 +38,11 @@ void App::onMidiBindingsChanged(std::function<void()> callback)
 void App::onAudioListChanged(std::function<void()> callback)
 {
     m_audioengine.onAudioListChanged(std::move(callback));
+}
+
+
+void App::onPageChanged(std::function<void(int)> callback) {
+    m_pageChangedCallback = callback;
 }
 
 

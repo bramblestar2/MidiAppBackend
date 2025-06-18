@@ -33,6 +33,7 @@ public:
     void setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback);
     void onMidiBindingsChanged(std::function<void()> callback);
     void onAudioListChanged(std::function<void()> callback);
+    void onPageChanged(std::function<void(int)> callback);
 
     //returns binding ID
     int addMidiBinding(MidiBinding binding);
@@ -70,4 +71,6 @@ private:
     int m_currentPage = 0;
 
     std::function<void(MidiDevice*, MidiMessage)> m_midiCallback;
+
+    std::function<void(int)> m_pageChangedCallback;
 };
