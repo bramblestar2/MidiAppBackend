@@ -448,3 +448,18 @@ bool App::loadAudio(std::string filepath)
     this->audioEngine().load(audios);
     return true;
 }
+
+
+void App::startRecording() {
+    this->midiManager().startRecording();
+}
+
+
+void App::stopRecording() {
+    this->midiManager().stopRecording();
+}
+
+
+std::vector<std::pair<std::string, std::vector<MidiMessage>>> App::getRecordings() const {
+    return this->m_manager.getRecordings();
+}

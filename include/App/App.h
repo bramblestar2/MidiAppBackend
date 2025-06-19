@@ -52,6 +52,10 @@ public:
 
     MidiManager& midiManager() { return m_manager; }
 
+    void startRecording();
+    void stopRecording();
+    std::vector<std::pair<std::string, std::vector<MidiMessage>>> getRecordings() const;
+
     nlohmann::json json();
     bool load(std::string directory);
     bool save(std::string directory);
