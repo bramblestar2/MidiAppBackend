@@ -46,10 +46,16 @@ void App::onPageChanged(std::function<void(int)> callback) {
 }
 
 
+void App::onDeviceRefresh(std::function<void()> callback) {
+    m_manager.setDevicesRefreshCallback(std::move(callback));
+}
+
+
 int App::addMidiBinding(MidiBinding binding) 
 {
     return m_midiBindingsManager.addMidiBinding(binding);
 }
+
 
 void App::removeMidiBinding(const int id) 
 {

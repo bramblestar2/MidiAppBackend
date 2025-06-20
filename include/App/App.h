@@ -34,6 +34,7 @@ public:
     void onMidiBindingsChanged(std::function<void()> callback);
     void onAudioListChanged(std::function<void()> callback);
     void onPageChanged(std::function<void(int)> callback);
+    void onDeviceRefresh(std::function<void()> callback);
 
     //returns binding ID
     int addMidiBinding(MidiBinding binding);
