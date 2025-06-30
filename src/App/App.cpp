@@ -91,6 +91,10 @@ void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
     m_midiBindingsManager.handleMidiMessage(this, device, msg);
 }
 
+int App::createAudio(AudioBuilder builder)
+{
+    return m_audioengine.create(builder);
+}
 
 nlohmann::json App::json() {
     std::map<std::string, std::vector<MidiBinding>> pages;
