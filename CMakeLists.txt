@@ -15,8 +15,8 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
-add_subdirectory(external/AudioEngine)
-add_subdirectory(external/Midi)
+add_subdirectory(AudioEngine)
+add_subdirectory(MidiBackend)
 
 
 # LIBRARY
@@ -45,7 +45,7 @@ target_link_libraries(MidiAppCore
         unofficial::sqlite3::sqlite3
 
         improved_rust_audio
-        MidiManager
+        MidiReworkCore
 )
 
 add_dependencies(MidiAppCore

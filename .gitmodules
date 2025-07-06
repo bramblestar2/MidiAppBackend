@@ -1,6 +1,7 @@
-[submodule "external/Midi"]
-	path = external/Midi
-	url = ssh://pidevice-1@192.168.86.47:2222/jay/LinuxMidiTest.git
-[submodule "external/AudioEngine"]
-	path = external/AudioEngine
+[submodule "MidiBackend"]
+	path = MidiBackend
+	url = ssh://pidevice-1@192.168.86.47:2222/jay/libremiditest.git
+[submodule "AudioBackend"]
+	path = AudioBackend
 	url = ssh://pidevice-1@192.168.86.47:2222/jay/ImprovedRustAudio.git
+
