@@ -56,7 +56,7 @@ public:
 
     void startRecording();
     void stopRecording();
-    std::vector<std::pair<std::string, std::vector<MidiMessage>>> recorded();
+    std::vector<std::pair<std::string, std::vector<MidiMessageRecord>>> recorded();
 
     nlohmann::json json();
     bool load(std::string directory);

@@ -472,6 +472,6 @@ void App::stopRecording() {
 }
 
 
-std::vector<std::pair<std::string, std::vector<MidiMessage>>> App::recorded() {
+std::vector<std::pair<std::string, std::vector<MidiMessageRecord>>> App::recorded() {
     return this->m_manager.recorded();
 }

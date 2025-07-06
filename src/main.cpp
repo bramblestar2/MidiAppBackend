@@ -37,12 +37,17 @@ int main() {
     app.addMidiBinding(pageBinding);
     app.addMidiBinding(backBinding);
 
+    
     app.json();
     
     app.save("/home/jay/Desktop/TestingAudio");
     
     app.load("/home/jay/Desktop/TestingAudio");
+    
+    std::cin.get();
 
+    app.midiManager().refresh();
+    
     std::cin.get();
 
     spdlog::dump_backtrace();
