@@ -12,9 +12,11 @@ void MidiBindingManager::handleMidiMessage(App* app, MidiDevice* device, MidiMes
         int page = app->getCurrentPage();
 
         for (auto& b : m_midiBindingsPages.at(page)) {
+            int key = msg[1];
+
             if (b.deviceName == name &&
-                b.eventType == msg.type() &&
-                b.key == msg.key) {
+                b.eventType == msg.get_message_type() &&
+                b.key == key) {
                 for (auto& action : b.actions) {
                     action(*app);
                 }

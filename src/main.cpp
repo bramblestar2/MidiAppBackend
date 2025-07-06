@@ -16,12 +16,11 @@ int main() {
     std::string pathMpeg = "/home/jay/Downloads/pickupCoin.mp3";
     std::string pathLongMpeg = "/home/jay/Downloads/Pumpkin  - C418.mp3";
 
-
     App app;
-    app.setMidiCallback([](MidiDevice* device, MidiMessage msg) {
-        std::cout << device->name() << ": " << std::hex << msg.key << std::endl;
+    app.onMidiCallback([](MidiDevice* device, MidiMessage msg) {
+        std::cout << device->name() << ": " << std::hex << (int)msg[1] << std::endl;
     });
-
+    
     AudioBuilder builderOne;
     builderOne.set_file(pathWav);
     AudioBuilder builderTwo;
@@ -31,20 +30,17 @@ int main() {
 
     app.setCurrentPage(0);
 
-    auto binding = MidiBindingBuilder("Novation Launchpad Pro").audio(idOne).key(0x5E).type(MidiMessage::NoteOn).on_page(0).build();
-    auto pageBinding = MidiBindingBuilder("Novation Launchpad Pro").audio(idTwo).key(0x5F).type(MidiMessage::NoteOn).on_page(0).change_page_to(1).build();
-    auto backBinding = MidiBindingBuilder("Novation Launchpad Pro").key(0x5F).type(MidiMessage::NoteOn).on_page(1).change_page_to(0).build();
+    auto binding = MidiBindingBuilder("Novation Launchpad Pro").audio(idOne).key(0x5E).type(libremidi::message_type::NOTE_ON).on_page(0).build();
+    auto pageBinding = MidiBindingBuilder("Novation Launchpad Pro").audio(idTwo).key(0x5F).type(libremidi::message_type::NOTE_ON).on_page(0).change_page_to(1).build();
+    auto backBinding = MidiBindingBuilder("Novation Launchpad Pro").key(0x5F).type(libremidi::message_type::NOTE_ON).on_page(1).change_page_to(0).build();
     app.addMidiBinding(binding);
     app.addMidiBinding(pageBinding);
     app.addMidiBinding(backBinding);
 
-    
-    app.midiManager().refresh();
-    
     app.json();
-
+    
     app.save("/home/jay/Desktop/TestingAudio");
-
+    
     app.load("/home/jay/Desktop/TestingAudio");
 
     std::cin.get();

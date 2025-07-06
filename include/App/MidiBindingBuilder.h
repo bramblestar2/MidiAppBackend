@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <Midi/midimessage.h>
 #include "App/types.h"
 
 
@@ -18,13 +17,13 @@ public:
     MidiBindingBuilder& on_page(int page);
     MidiBindingBuilder& change_page_to(int page);
     MidiBindingBuilder& key(int key);
-    MidiBindingBuilder& type(MidiMessage::Type type);
+    MidiBindingBuilder& type(libremidi::message_type type);
 
     MidiBinding build();
 
 private:
     std::string m_deviceName;
-    MidiMessage::Type m_type = MidiMessage::Type::UNKNOWN;
+    libremidi::message_type m_type{libremidi::message_type::INVALID};
     int m_key = 0;
     int m_onPage = 0;
     int m_toPage = 0;

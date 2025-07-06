@@ -37,7 +37,7 @@ MidiBindingBuilder &MidiBindingBuilder::key(int key) {
 }
 
 
-MidiBindingBuilder &MidiBindingBuilder::type(MidiMessage::Type type) {
+MidiBindingBuilder &MidiBindingBuilder::type(libremidi::message_type type) {
     m_type = type;
     return *this;
 }

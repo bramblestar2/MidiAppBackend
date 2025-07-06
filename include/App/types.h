@@ -4,16 +4,16 @@
 #include <vector>
 #include <functional>
 #include <mutex>
-#include <Midi/midimessage.h>
-
 #include <nlohmann/json.hpp>
+
+#include <Midi/types.h>
 
 class App;
 
 struct MidiBinding {
     int id;
     std::string deviceName;
-    MidiMessage::Type eventType;
+    libremidi::message_type eventType;
     int key;
     std::vector<std::function<void(App&)>> actions;
     int audioId;
@@ -38,7 +38,7 @@ struct MidiBinding {
     void from_json(const nlohmann::json& j) {
         j.at("id").get_to<int>(id);
         j.at("deviceName").get_to<std::string>(deviceName);
-        j.at("eventType").get_to<MidiMessage::Type>(eventType);
+        j.at("eventType").get_to<libremidi::message_type>(eventType);
         j.at("key").get_to<int>(key);
         // j.at("actions").get_to(actions);
         j.at("audioId").get_to<int>(audioId);

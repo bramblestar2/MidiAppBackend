@@ -3,7 +3,6 @@
 #include <mutex>
 #include <map>
 #include <functional>
-#include <Midi/Midi.h>
 
 #include "IdPool.h"
 #include "types.h"

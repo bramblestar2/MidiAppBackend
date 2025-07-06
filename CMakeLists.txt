@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 
 project(
     MidiApp
@@ -6,7 +6,8 @@ project(
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(rtmidi CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -45,17 +46,12 @@ target_link_libraries(MidiAppCore
         unofficial::sqlite3::sqlite3
 
         improved_rust_audio
-        MidiManager
+        MidiReworkCore
 )
 
 add_dependencies(MidiAppCore
     improved_rust_audio
-    MidiManager
-)
-
-set_target_properties(MidiAppCore PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    MidiReworkCore
 )
 
 
@@ -68,8 +64,4 @@ add_executable(MidiApp
 target_link_libraries(MidiApp
     PRIVATE
         MidiAppCore
-)
-
-set_target_properties(MidiApp PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )

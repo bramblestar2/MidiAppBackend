@@ -2,8 +2,8 @@
 #include <map>
 
 #include <spdlog/spdlog.h>
-#include <Midi/Midi.h>
 // #include <Audio/Audio_Includes.h>
+#include <Midi/MidiManager.h>
 
 #include <Audio/Audio.h>
 
@@ -30,11 +30,11 @@ public:
     void setCurrentPage(const int page);
     const int& getCurrentPage() const { return m_currentPage; }
 
-    void setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback);
+    void onMidiCallback(std::function<void(MidiDevice*, MidiMessage)> callback);
     void onMidiBindingsChanged(std::function<void()> callback);
     void onAudioListChanged(std::function<void()> callback);
     void onPageChanged(std::function<void(int)> callback);
-    void onDeviceRefresh(std::function<void()> callback);
+    void onDeviceRefresh(std::function<void(std::vector<MidiDevice*>)> callback);
 
     //returns binding ID
     int addMidiBinding(MidiBinding binding);
@@ -50,12 +50,13 @@ public:
 
     AudioEngine& audioEngine() { return m_audioengine; }
     AudioBuilder createAudio();
+    int createAudio(AudioBuilder builder);
 
     MidiManager& midiManager() { return m_manager; }
 
     void startRecording();
     void stopRecording();
-    std::vector<std::pair<std::string, std::vector<MidiMessage>>> getRecordings() const;
+    std::vector<std::pair<std::string, std::vector<MidiMessage>>> recorded();
 
     nlohmann::json json();
     bool load(std::string directory);

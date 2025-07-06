@@ -9,7 +9,7 @@
 
 
 App::App() {
-    m_manager.setMidiCallback([this](MidiDevice* device, MidiMessage msg) {
+    m_manager.onMidiMessage([this](MidiDevice* device, MidiMessage& msg) {
         this->handleMidiMessage(device, msg);
 
         if (this->m_midiCallback) this->m_midiCallback(device, msg);
@@ -25,8 +25,8 @@ void App::setCurrentPage(const int page) {
 }
 
 
-void App::setMidiCallback(std::function<void(MidiDevice*, MidiMessage)> &&callback) {
-    m_midiCallback = std::move(callback);
+void App::onMidiCallback(std::function<void(MidiDevice*, MidiMessage)> callback) {
+    m_midiCallback = callback;
 }
 
 void App::onMidiBindingsChanged(std::function<void()> callback)
@@ -46,8 +46,8 @@ void App::onPageChanged(std::function<void(int)> callback) {
 }
 
 
-void App::onDeviceRefresh(std::function<void()> callback) {
-    m_manager.setDevicesRefreshCallback(std::move(callback));
+void App::onDeviceRefresh(std::function<void(std::vector<MidiDevice*>)> callback) {
+    m_manager.onDevicesRefresh(std::move(callback));
 }
 
 
@@ -89,6 +89,12 @@ std::vector<MidiBinding *> App::getMidiBindings()
 
 void App::handleMidiMessage(MidiDevice* device, MidiMessage msg) {
     m_midiBindingsManager.handleMidiMessage(this, device, msg);
+}
+
+
+int App::createAudio(AudioBuilder builder)
+{
+    return m_audioengine.create(builder);
 }
 
 
@@ -381,7 +387,7 @@ bool App::loadBindings(std::string filepath)
         MidiBinding binding;
         binding.id = sqlite3_column_int(stmt, 0);
         binding.deviceName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-        binding.eventType = static_cast<MidiMessage::Type>(sqlite3_column_int(stmt, 2));
+        binding.eventType = static_cast<libremidi::message_type>(sqlite3_column_int(stmt, 2));
         binding.key = sqlite3_column_int(stmt, 3);
         binding.audioId = sqlite3_column_int(stmt, 4);
         binding.toPage = sqlite3_column_int(stmt, 5);
@@ -466,6 +472,6 @@ void App::stopRecording() {
 }
 
 
-std::vector<std::pair<std::string, std::vector<MidiMessage>>> App::getRecordings() const {
-    return this->m_manager.getRecordings();
+std::vector<std::pair<std::string, std::vector<MidiMessage>>> App::recorded() {
+    return this->m_manager.recorded();
 }

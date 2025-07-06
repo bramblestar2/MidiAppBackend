@@ -100,6 +100,8 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "csignal": "cpp",
+        "source_location": "cpp"
     }
 }
