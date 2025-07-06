@@ -50,7 +50,6 @@ public:
 
     AudioEngine& audioEngine() { return m_audioengine; }
     AudioBuilder createAudio();
-    int createAudio(AudioBuilder builder);
 
     MidiManager& midiManager() { return m_manager; }
 
