@@ -188,6 +188,16 @@ bool App::saveBindings(std::string filepath)
         return false;
     }
 
+    const char* delete_sql = "DELETE FROM midi_bindings;";
+
+    if (sqlite3_exec(db, delete_sql, nullptr, nullptr, &err) != SQLITE_OK) {
+        spdlog::error("DELETE failed: {}", err);
+        sqlite3_free(err);
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        sqlite3_close(db);
+        return false;
+    }
+
     const char* insert_sql =
         "INSERT OR REPLACE INTO midi_bindings "
         "(id, device, event, key_val, audio_id, to_page, on_page) "
@@ -279,6 +289,16 @@ bool App::saveAudio(std::string filepath)
 
     if (sqlite3_exec(db, create_sql, nullptr, nullptr, &err) != SQLITE_OK) {
         spdlog::error("CREATE TABLE failed: {}", err);
+        sqlite3_free(err);
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        sqlite3_close(db);
+        return false;
+    }
+
+    const char* delete_sql = "DELETE FROM audios;";
+
+    if (sqlite3_exec(db, delete_sql, nullptr, nullptr, &err) != SQLITE_OK) {
+        spdlog::error("DELETE failed: {}", err);
         sqlite3_free(err);
         sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
         sqlite3_close(db);
@@ -401,6 +421,8 @@ bool App::loadBindings(std::string filepath)
 
 
     m_midiBindingsManager.setMidiBindings(pages);
+
+
 
     return true;
 }

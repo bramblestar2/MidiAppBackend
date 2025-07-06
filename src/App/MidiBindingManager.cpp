@@ -36,6 +36,8 @@ void MidiBindingManager::setMidiBindings(std::map<int, std::vector<MidiBinding>>
 {
     std::lock_guard<std::mutex> lock(m_bindingsMutex);
     m_midiBindingsPages = bindings;
+
+    if (m_midiBindingsChangedCallback) this->m_midiBindingsChangedCallback();
 }
 
 
