@@ -6,7 +6,7 @@ project(
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(rtmidi CONFIG REQUIRED)
@@ -16,8 +16,21 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
-add_subdirectory(external/AudioEngine)
-add_subdirectory(external/Midi)
+include(FetchContent)
+
+FetchContent_Declare(
+    improved_rust_audio
+    GIT_REPOSITORY ssh://pidevice-1@192.168.86.47:2222/jay/ImprovedRustAudio.git
+    GIT_TAG origin/master
+)
+FetchContent_MakeAvailable(improved_rust_audio)
+
+FetchContent_Declare(
+    MidiReworkCore
+    GIT_REPOSITORY ssh://pidevice-1@192.168.86.47:2222/jay/libremiditest.git
+    GIT_TAG origin/master
+)
+FetchContent_MakeAvailable(MidiReworkCore)
 
 
 # LIBRARY
@@ -47,11 +60,6 @@ target_link_libraries(MidiAppCore
 
         improved_rust_audio
         MidiReworkCore
-)
-
-add_dependencies(MidiAppCore
-    improved_rust_audio
-    MidiReworkCore
 )
 
 
