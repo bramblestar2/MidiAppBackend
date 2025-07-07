@@ -20,14 +20,14 @@ include(FetchContent)
 
 FetchContent_Declare(
     improved_rust_audio
-    GIT_REPOSITORY ssh://pidevice-1@192.168.86.47:2222/jay/ImprovedRustAudio.git
+    GIT_REPOSITORY https://github.com/bramblestar2/ImprovedRustAudio.git
     GIT_TAG origin/master
 )
 FetchContent_MakeAvailable(improved_rust_audio)
 
 FetchContent_Declare(
     MidiReworkCore
-    GIT_REPOSITORY ssh://pidevice-1@192.168.86.47:2222/jay/libremiditest.git
+    GIT_REPOSITORY https://github.com/bramblestar2/MidiRework.git
     GIT_TAG origin/master
 )
 FetchContent_MakeAvailable(MidiReworkCore)
