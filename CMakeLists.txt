@@ -16,22 +16,8 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
-include(FetchContent)
-
-FetchContent_Declare(
-    improved_rust_audio
-    GIT_REPOSITORY https://github.com/bramblestar2/ImprovedRustAudio.git
-    GIT_TAG origin/master
-)
-FetchContent_MakeAvailable(improved_rust_audio)
-
-FetchContent_Declare(
-    MidiReworkCore
-    GIT_REPOSITORY https://github.com/bramblestar2/MidiRework.git
-    GIT_TAG origin/master
-)
-FetchContent_MakeAvailable(MidiReworkCore)
-
+add_subdirectory(backend/audio)
+add_subdirectory(backend/midi)
 
 # LIBRARY
 
